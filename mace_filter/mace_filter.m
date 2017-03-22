@@ -21,7 +21,7 @@ for i = 1 : num_files
     img = rgb2gray(img);
     img = double(img);
     img = fft2(img, targetRow, targetCol);
-    X(:, i) = reshape(transpose(img), [(targetRow * targetCol) , 1]);
+    X(:, i) = reshape((img), [(targetRow * targetCol) , 1]);
 end
 
 % Starting design MACE filter
@@ -30,7 +30,7 @@ D = diag(avgps);
 u = 10 ^ 6 * ones(num_files, 1);
 D_inv = inv(D);
 H = D_inv * X * inv(X' * D_inv * X) * u;
-H_mace = transpose(reshape(transpose(H), [targetCol, targetRow]));
+H_mace = reshape((H), [targetRow, targetCol]);
 %H_tmp = zeros(targetRow, targetCol);
 %H_tmp(1: row, 1:col) = H_mace(1: row, 1:col);
 %H_mace = H_tmp;
