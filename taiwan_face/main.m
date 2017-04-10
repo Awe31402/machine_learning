@@ -21,21 +21,26 @@ end
 
 eig_num = 24;
 
-[downGradeData pcaBasis] = pca(X, eig_num);
+[eigenFaces pcaBasis] = pca(X, eig_num);
 
-[inner_proc ldaBasis] = lda(downGradeData, labels);
+[fisherFaces ldaBasis] = lda(eigenFaces, labels);
+
+labels = labels - ones(1, traning_data_num);
+labels(1: female_start - 1) = -1 * ones(1, female_start - 1);
+[w, b] = svm(fisherFaces, labels);
 
 % Verify male or female by K-NN algorithm
-tst_file = 'test_boy.jpg';
-nearest_num = 5;
+tst_file = 'test.jpg';
+nearest_num = 3;
 img = imread(tst_file);
 [row col] = size(img);
 img = double(img);
 reshape_img = reshape(img, [(row * col), 1]);
 downDat = pcaBasis' * reshape_img;
+%size(downDat)
 optDat = ldaBasis' * downDat;
 for i = 1: traning_data_num
-    dist(i) = norm(optDat - inner_proc(:, i));
+    dist(i) = norm(optDat - fisherFaces(:, i));
 end
 
 female = 0;
@@ -52,8 +57,15 @@ for i = 1: nearest_num
 end
 
 if (female > male)
-    printf('%s is female\n', tst_file);
+    printf('K-NN: test data is female\n');
 else
-    printf('%s is male\n', tst_file);
+    printf('K-NN: test data is male\n');
 end
 
+% Verify Gender By SVM
+class = w' * optDat + b;
+if (class < 0)
+    printf('SVM: test data is male\n');
+else
+    printf('SVM: test data is female\n');
+end
