@@ -5,7 +5,7 @@ function [w, b] = svm(data, labels)
     q = -1 * ones(dataNum, 1);
 
     % Quadratic Programming for KKT dual
-    [alpha, OBJS, INFO, LAMBDA] = qp([], K, q, [], [],
+    [alpha, OBJS, INFO, LAMBDA] = qp([], K, q, labels, 0,
         zeros(dataNum, 1), []);
 
     %Check contraint
